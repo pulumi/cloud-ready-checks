@@ -47,6 +47,19 @@ type StateChecker struct {
 	readyMsg   string      // Status message to show if the state is Ready.
 }
 
+type StateCheckerArgs struct {
+	Conditions   []Condition // Conditions that must be true for the state to be Ready.
+	ReadyMessage string      // Status message to show if the state is Ready.
+}
+
+func NewStateChecker(args *StateCheckerArgs) *StateChecker {
+	return &StateChecker{
+		ready:      false,
+		conditions: args.Conditions,
+		readyMsg:   args.ReadyMessage,
+	}
+}
+
 // Ready is true if all the Conditions associated with this checker are true. Ready will always return false prior
 // to running Update.
 func (s *StateChecker) Ready() bool {
