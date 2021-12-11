@@ -12,26 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package logging
+package pod
 
-// TimeOrderedLogSet stores a temporally-ordered set of log messages.
-type TimeOrderedLogSet struct {
-	exists   map[Message]bool
-	Messages Messages
-}
-
-// Add appends a message to the time-ordered set.
-func (o *TimeOrderedLogSet) Add(msg Message) {
-	// Ensure memory has been allocated.
-	if o.exists == nil {
-		o.exists = make(map[Message]bool)
-	}
-	if o.Messages == nil {
-		o.Messages = []Message{}
-	}
-
-	if !o.exists[msg] {
-		o.Messages = append(o.Messages, msg)
-		o.exists[msg] = true
-	}
-}
+// TODO

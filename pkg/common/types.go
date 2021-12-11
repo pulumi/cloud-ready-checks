@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// TODO: probably refactor package names
 package common
 
 import (
@@ -42,52 +43,43 @@ type Condition func(state interface{}) Result
 
 // StateChecker holds the data required to generically implement await logic.
 type StateChecker struct {
-	ready      bool        // True if all the conditions evaluated to true on the most recent Update.
 	conditions []Condition // Conditions that must be true for the state to be Ready.
-	readyMsg   string      // Status message to show if the state is Ready.
 }
 
 type StateCheckerArgs struct {
-	Conditions   []Condition // Conditions that must be true for the state to be Ready.
-	ReadyMessage string      // Status message to show if the state is Ready.
+	Conditions []Condition // Conditions that must be true for the state to be Ready.
 }
 
 func NewStateChecker(args *StateCheckerArgs) *StateChecker {
 	return &StateChecker{
-		ready:      false,
 		conditions: args.Conditions,
-		readyMsg:   args.ReadyMessage,
 	}
 }
 
-// Ready is true if all the Conditions associated with this checker are true. Ready will always return false prior
-// to running Update.
-func (s *StateChecker) Ready() bool {
-	return s.ready
+func (s *StateChecker) Ready(state interface{}) bool {
+	ok, _ := s.readyDetails(state)
+	return ok
 }
 
-// Update runs the conditions associated with the StateChecker against the provided object. Each condition produces
-// a status message that is appended to the returned list of Messages. Iff all of the Conditions are true, the ready
-// status is set to true, otherwise, the ready condition is set to false.
-func (s *StateChecker) Update(state interface{}) logging.Messages {
-	s.ready = false
+func (s *StateChecker) ReadyStatus(state interface{}) (bool, Result) {
+	ok, results := s.readyDetails(state)
+	return ok, results[len(results)-1]
+}
 
-	var messages logging.Messages
-	for i, condition := range s.conditions {
-		prefix := fmt.Sprintf("[%d/%d]", i, len(s.conditions))
+func (s *StateChecker) ReadyDetails(state interface{}) (bool, []Result) {
+	return s.readyDetails(state)
+}
 
+func (s *StateChecker) readyDetails(state interface{}) (bool, []Result) {
+	var results []Result
+
+	for _, condition := range s.conditions {
 		result := condition(state)
-		messages = append(messages, logging.StatusMessage(fmt.Sprintf("%s %s", prefix, result.Description)))
-
+		results = append(results, result)
 		if !result.Ok {
-			if !result.Message.Empty() {
-				messages = append(messages, result.Message)
-			}
-			return messages
+			return false, results
 		}
 	}
 
-	s.ready = true
-	messages = append(messages, logging.StatusMessage(s.readyMsg))
-	return messages
+	return true, results
 }

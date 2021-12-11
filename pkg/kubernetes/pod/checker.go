@@ -21,14 +21,12 @@ import (
 	"github.com/pulumi/cloud-ready-checks/pkg/common"
 	"github.com/pulumi/cloud-ready-checks/pkg/common/logging"
 	"github.com/pulumi/cloud-ready-checks/pkg/kubernetes"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/util/cmdutil"
 	corev1 "k8s.io/api/core/v1"
 )
 
 func NewPodChecker() *common.StateChecker {
 	return common.NewStateChecker(&common.StateCheckerArgs{
-		ReadyMessage: cmdutil.EmojiOr("✅ Pod ready", "Pod ready"),
-		Conditions:   []common.Condition{podScheduled, podInitialized, podReady},
+		Conditions: []common.Condition{podScheduled, podInitialized, podReady},
 	})
 }
 
