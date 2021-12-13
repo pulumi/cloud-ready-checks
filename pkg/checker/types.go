@@ -16,6 +16,7 @@ package checker
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/pulumi/cloud-ready-checks/pkg/checker/logging"
 )
@@ -35,6 +36,18 @@ func (r Result) String() string {
 	}
 
 	return s
+}
+
+// Results is a slice of Result objects.
+type Results []Result
+
+func (rr Results) String() string {
+	s := strings.Builder{}
+	for _, r := range rr {
+		s.WriteString(fmt.Sprintf("%s\n", r))
+	}
+
+	return s.String()
 }
 
 // Condition is a function that checks a state and returns a Result.
@@ -65,12 +78,12 @@ func (s *StateChecker) ReadyStatus(state interface{}) (bool, Result) {
 	return ok, results[len(results)-1]
 }
 
-func (s *StateChecker) ReadyDetails(state interface{}) (bool, []Result) {
+func (s *StateChecker) ReadyDetails(state interface{}) (bool, Results) {
 	return s.readyDetails(state)
 }
 
-func (s *StateChecker) readyDetails(state interface{}) (bool, []Result) {
-	var results []Result
+func (s *StateChecker) readyDetails(state interface{}) (bool, Results) {
+	var results Results
 
 	for _, condition := range s.conditions {
 		result := condition(state)

@@ -16,6 +16,7 @@ package pod
 
 import (
 	"fmt"
+	"github.com/pulumi/cloud-ready-checks/pkg/checker"
 	"testing"
 
 	"github.com/pulumi/cloud-ready-checks/internal"
@@ -193,16 +194,18 @@ func Test_Pod_Checker(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			checker := NewPodChecker()
+			podChecker := NewPodChecker()
 
 			ready := false
+			var details checker.Results
 			podStates := loadWorkflows(t, tt.workflowPaths...)
 			for _, podState := range podStates {
-				ready = checker.Ready(podState)
+				ready, details = podChecker.ReadyDetails(podState)
 				if ready {
 					break
 				}
 			}
+			fmt.Println(details)
 			if ready != tt.expectReady {
 				t.Errorf("Ready() = %t, want %t", ready, tt.expectReady)
 			}
