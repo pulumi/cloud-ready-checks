@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// TODO: probably refactor package names
-package common
+package checker
 
 import (
 	"fmt"
 
-	"github.com/pulumi/cloud-ready-checks/pkg/common/logging"
+	"github.com/pulumi/cloud-ready-checks/pkg/checker/logging"
 )
 
 // Result specifies the result of a Condition applied to an input object.

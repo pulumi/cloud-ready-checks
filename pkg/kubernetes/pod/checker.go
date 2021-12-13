@@ -18,15 +18,15 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pulumi/cloud-ready-checks/pkg/common"
-	"github.com/pulumi/cloud-ready-checks/pkg/common/logging"
+	"github.com/pulumi/cloud-ready-checks/pkg/checker"
+	"github.com/pulumi/cloud-ready-checks/pkg/checker/logging"
 	"github.com/pulumi/cloud-ready-checks/pkg/kubernetes"
 	corev1 "k8s.io/api/core/v1"
 )
 
-func NewPodChecker() *common.StateChecker {
-	return common.NewStateChecker(&common.StateCheckerArgs{
-		Conditions: []common.Condition{podScheduled, podInitialized, podReady},
+func NewPodChecker() *checker.StateChecker {
+	return checker.NewStateChecker(&checker.StateCheckerArgs{
+		Conditions: []checker.Condition{podScheduled, podInitialized, podReady},
 	})
 }
 
@@ -34,9 +34,9 @@ func NewPodChecker() *common.StateChecker {
 // Conditions
 //
 
-func podScheduled(obj interface{}) common.Result {
-	pod := toPod(obj)
-	result := common.Result{Description: fmt.Sprintf(
+func podScheduled(obj interface{}) checker.Result {
+	pod := obj.(*corev1.Pod)
+	result := checker.Result{Description: fmt.Sprintf(
 		"Waiting for Pod %q to be scheduled", kubernetes.FullyQualifiedName(pod))}
 
 	if condition, found := filterConditions(pod.Status.Conditions, corev1.PodScheduled); found {
@@ -54,9 +54,9 @@ func podScheduled(obj interface{}) common.Result {
 	return result
 }
 
-func podInitialized(obj interface{}) common.Result {
-	pod := toPod(obj)
-	result := common.Result{Description: fmt.Sprintf(
+func podInitialized(obj interface{}) checker.Result {
+	pod := obj.(*corev1.Pod)
+	result := checker.Result{Description: fmt.Sprintf(
 		"Waiting for Pod %q to be initialized", kubernetes.FullyQualifiedName(pod))}
 
 	if condition, found := filterConditions(pod.Status.Conditions, corev1.PodInitialized); found {
@@ -77,9 +77,9 @@ func podInitialized(obj interface{}) common.Result {
 	return result
 }
 
-func podReady(obj interface{}) common.Result {
-	pod := toPod(obj)
-	result := common.Result{Description: fmt.Sprintf(
+func podReady(obj interface{}) checker.Result {
+	pod := obj.(*corev1.Pod)
+	result := checker.Result{Description: fmt.Sprintf(
 		"Waiting for Pod %q to be ready", kubernetes.FullyQualifiedName(pod))}
 
 	if condition, found := filterConditions(pod.Status.Conditions, corev1.PodReady); found {
@@ -103,11 +103,6 @@ func podReady(obj interface{}) common.Result {
 //
 // Helpers
 //
-
-func toPod(obj interface{}) *corev1.Pod {
-	// TODO: Probably need more robust logic here
-	return obj.(*corev1.Pod)
-}
 
 func collectContainerStatusErrors(statuses []corev1.ContainerStatus) []string {
 	var errs []string
