@@ -19,7 +19,7 @@ import (
 
 	"github.com/pulumi/cloud-ready-checks/internal"
 	"github.com/pulumi/cloud-ready-checks/pkg/kubernetes"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -46,15 +46,68 @@ func Test_podInitialized(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			jsonBytes, err := internal.TestStates.ReadFile(tt.testStatePath)
-			assert.NoError(t, err)
-
-			state := kubernetes.MustLoadState(jsonBytes)
-			pod := corev1.Pod{}
-			err = kubernetes.BuiltInScheme.Convert(state, &pod, nil)
-			assert.NoError(t, err)
-			if got := podInitialized(&pod); got.Ok != tt.want {
+			pod := loadPod(t, tt.testStatePath)
+			if got := podInitialized(pod); got.Ok != tt.want {
 				t.Errorf("podInitialized() = %v, want %v", got.Ok, tt.want)
+			}
+		})
+	}
+}
+
+func Test_podReady(t *testing.T) {
+	tests := []struct {
+		name          string
+		testStatePath string
+		want          bool
+	}{
+		{
+			"Pod ready",
+			"states/kubernetes/pod/ready.json",
+			true,
+		},
+		{
+			"Pod succeeded",
+			"states/kubernetes/pod/succeeded.json",
+			true,
+		},
+		{
+			"Pod unready",
+			"states/kubernetes/pod/initialized.json",
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pod := loadPod(t, tt.testStatePath)
+			if got := podReady(pod); got.Ok != tt.want {
+				t.Errorf("podReady() = %v, want %v", got.Ok, tt.want)
+			}
+		})
+	}
+}
+
+func Test_podScheduled(t *testing.T) {
+	tests := []struct {
+		name          string
+		testStatePath string
+		want          bool
+	}{
+		{
+			"Pod scheduled",
+			"states/kubernetes/pod/scheduled.json",
+			true,
+		},
+		{
+			"Pod unscheduled",
+			"states/kubernetes/pod/unscheduled.json",
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pod := loadPod(t, tt.testStatePath)
+			if got := podScheduled(pod); got.Ok != tt.want {
+				t.Errorf("podScheduled() = %v, want %v", got.Ok, tt.want)
 			}
 		})
 	}
@@ -151,3 +204,19 @@ func Test_podInitialized(t *testing.T) {
 //		})
 //	}
 //}
+
+//
+// Helpers
+//
+
+func loadPod(t *testing.T, statePath string) *corev1.Pod {
+	jsonBytes, err := internal.TestStates.ReadFile(statePath)
+	require.NoError(t, err)
+
+	state := kubernetes.MustLoadState(jsonBytes)
+	pod := corev1.Pod{}
+	err = kubernetes.BuiltInScheme.Convert(state, &pod, nil)
+	require.NoError(t, err)
+
+	return &pod
+}
