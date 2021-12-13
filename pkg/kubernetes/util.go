@@ -15,7 +15,12 @@
 package kubernetes
 
 import (
+	"encoding/json"
+	"fmt"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 // FullyQualifiedName returns the fully qualified name of the object in the form `[namespace]/name`.
@@ -26,4 +31,49 @@ func FullyQualifiedName(obj metav1.Object) string {
 		return obj.GetNamespace() + "/" + obj.GetName()
 	}
 	return obj.GetName()
+}
+
+// mustConvertObjToUnstructured converts a raw object to Unstructured and panics on error.
+func mustConvertObjToUnstructured(obj interface{}) *unstructured.Unstructured {
+	jsonBytes, err := json.Marshal(obj)
+	if err != nil {
+		panic(err)
+	}
+	uncastObj, err := runtime.Decode(unstructured.UnstructuredJSONScheme, jsonBytes)
+	if err != nil {
+		panic(err)
+	}
+
+	if uns, ok := uncastObj.(*unstructured.Unstructured); !ok {
+		panic(fmt.Sprintf("failed to cast obj to Unstructured: %#v", uncastObj))
+	} else {
+		return uns
+	}
+}
+
+// MustLoadState loads a JSON-encoded k8s event from the provided string, and returns a corresponding
+// Unstructured object. This function is intended to be used with vetted test data and will panic on error.
+func MustLoadState(jsonString []byte) *unstructured.Unstructured {
+	var obj interface{}
+	if err := json.Unmarshal(jsonString, &obj); err != nil {
+		panic(err)
+	}
+
+	return mustConvertObjToUnstructured(obj)
+}
+
+// MustLoadWorkflow loads a JSON array of k8s events from the provided string, and returns a corresponding
+// slice of Unstructured objects. This function is intended to be used with vetted test data and will panic on error.
+// Note: The test data can be produced with the `kubespy record` command.
+func MustLoadWorkflow(jsonString []byte) []*unstructured.Unstructured {
+	var objects []interface{}
+	if err := json.Unmarshal(jsonString, &objects); err != nil {
+		panic(err)
+	}
+	var unstructureds []*unstructured.Unstructured
+	for _, obj := range objects {
+		unstructureds = append(unstructureds, mustConvertObjToUnstructured(obj))
+	}
+
+	return unstructureds
 }
