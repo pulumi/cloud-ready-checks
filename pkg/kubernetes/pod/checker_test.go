@@ -136,59 +136,59 @@ func Test_Pod_Checker(t *testing.T) {
 	)
 
 	tests := []struct {
-		name         string
-		workflowPath []string
-		expectReady  bool
+		name          string
+		workflowPaths []string
+		expectReady   bool
 	}{
 		{
-			name:         "Pod added but not ready",
-			workflowPath: []string{workflow(added)},
-			expectReady:  false,
+			name:          "Pod added but not ready",
+			workflowPaths: []string{workflow(added)},
+			expectReady:   false,
 		},
 		{
-			name:         "Pod scheduled but not ready",
-			workflowPath: []string{workflow(scheduled)},
-			expectReady:  false,
+			name:          "Pod scheduled but not ready",
+			workflowPaths: []string{workflow(scheduled)},
+			expectReady:   false,
 		},
 		{
-			name:         "Pod create success",
-			workflowPath: []string{workflow(createSuccess)},
-			expectReady:  true,
+			name:          "Pod create success",
+			workflowPaths: []string{workflow(createSuccess)},
+			expectReady:   true,
 		},
 		{
-			name:         "Pod image pull error",
-			workflowPath: []string{workflow(imagePullError)},
-			expectReady:  false,
+			name:          "Pod image pull error",
+			workflowPaths: []string{workflow(imagePullError)},
+			expectReady:   false,
 		},
 		{
-			name:         "Pod create success after image pull failure resolved",
-			workflowPath: []string{workflow(imagePullError), workflow(imagePullErrorResolved)},
-			expectReady:  true,
+			name:          "Pod create success after image pull failure resolved",
+			workflowPaths: []string{workflow(imagePullError), workflow(imagePullErrorResolved)},
+			expectReady:   true,
 		},
 		{
-			name:         "Pod unscheduled",
-			workflowPath: []string{workflow(unscheduled)},
-			expectReady:  false,
+			name:          "Pod unscheduled",
+			workflowPaths: []string{workflow(unscheduled)},
+			expectReady:   false,
 		},
 		{
-			name:         "Pod unready",
-			workflowPath: []string{workflow(unready)},
-			expectReady:  false,
+			name:          "Pod unready",
+			workflowPaths: []string{workflow(unready)},
+			expectReady:   false,
 		},
 		{
-			name:         "Pod container terminated with error",
-			workflowPath: []string{workflow(containerTerminatedError)},
-			expectReady:  false,
+			name:          "Pod container terminated with error",
+			workflowPaths: []string{workflow(containerTerminatedError)},
+			expectReady:   false,
 		},
 		{
-			name:         "Pod container terminated successfully",
-			workflowPath: []string{workflow(containerTerminatedSuccess)},
-			expectReady:  false,
+			name:          "Pod container terminated successfully",
+			workflowPaths: []string{workflow(containerTerminatedSuccess)},
+			expectReady:   false,
 		},
 		{
-			name:         "Pod container terminated successfully with restartPolicy: Never",
-			workflowPath: []string{workflow(containerTerminatedSuccessRestartNever)},
-			expectReady:  true,
+			name:          "Pod container terminated successfully with restartPolicy: Never",
+			workflowPaths: []string{workflow(containerTerminatedSuccessRestartNever)},
+			expectReady:   true,
 		},
 	}
 	for _, tt := range tests {
@@ -196,10 +196,11 @@ func Test_Pod_Checker(t *testing.T) {
 			checker := NewPodChecker()
 
 			ready := false
-			for _, workflowPath := range tt.workflowPath {
-				podStates := loadWorkflow(t, workflowPath)
-				for _, podState := range podStates {
-					ready = checker.Ready(podState)
+			podStates := loadWorkflows(t, tt.workflowPaths...)
+			for _, podState := range podStates {
+				ready = checker.Ready(podState)
+				if ready {
+					break
 				}
 			}
 			if ready != tt.expectReady {
@@ -225,17 +226,19 @@ func loadPod(t *testing.T, statePath string) *corev1.Pod {
 	return &pod
 }
 
-func loadWorkflow(t *testing.T, workflowPath string) []*corev1.Pod {
-	jsonBytes, err := internal.TestStates.ReadFile(workflowPath)
-	require.NoError(t, err)
-
+func loadWorkflows(t *testing.T, workflowPaths ...string) []*corev1.Pod {
 	var pods []*corev1.Pod
-	states := kubernetes.MustLoadWorkflow(jsonBytes)
-	for _, state := range states {
-		pod := corev1.Pod{}
-		err = kubernetes.BuiltInScheme.Convert(state, &pod, nil)
+	for _, workflowPath := range workflowPaths {
+		jsonBytes, err := internal.TestStates.ReadFile(workflowPath)
 		require.NoError(t, err)
-		pods = append(pods, &pod)
+
+		states := kubernetes.MustLoadWorkflow(jsonBytes)
+		for _, state := range states {
+			pod := corev1.Pod{}
+			err = kubernetes.BuiltInScheme.Convert(state, &pod, nil)
+			require.NoError(t, err)
+			pods = append(pods, &pod)
+		}
 	}
 
 	return pods
