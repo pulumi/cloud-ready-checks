@@ -205,6 +205,7 @@ func Test_Pod_Checker(t *testing.T) {
 					break
 				}
 			}
+			fmt.Printf("Expect Ready() = %t\n", tt.expectReady)
 			fmt.Println(details)
 			if ready != tt.expectReady {
 				t.Errorf("Ready() = %t, want %t", ready, tt.expectReady)
