@@ -18,5 +18,5 @@ import (
 	"embed"
 )
 
-//go:embed states
+//go:embed states workflows
 var TestStates embed.FS

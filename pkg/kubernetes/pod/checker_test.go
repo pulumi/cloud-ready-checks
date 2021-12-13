@@ -15,6 +15,7 @@
 package pod
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/pulumi/cloud-ready-checks/internal"
@@ -117,93 +118,96 @@ func Test_podScheduled(t *testing.T) {
 // Test Pod State Checker using recorded events.
 //
 
-//func Test_Pod_Checker(t *testing.T) {
-//	podInit, err := internal.TestStates.ReadFile("states/kubernetes/pod/initialized.json")
-//	assert.NoError(t, err)
-//	fmt.Println(string(podInit))
-//	//workflow := func(name string) string {
-//	//	return workflowPath("pod", name)
-//	//}
-//	//const (
-//	//	added                                  = "added"
-//	//	containerTerminatedError               = "containerTerminatedError"
-//	//	containerTerminatedSuccess             = "containerTerminatedSuccess"
-//	//	containerTerminatedSuccessRestartNever = "containerTerminatedSuccessRestartNever"
-//	//	createSuccess                          = "createSuccess"
-//	//	imagePullError                         = "imagePullError"
-//	//	imagePullErrorResolved                 = "imagePullErrorResolved"
-//	//	scheduled                              = "scheduled"
-//	//	unready                                = "unready"
-//	//	unscheduled                            = "unscheduled"
-//	//)
-//	//
-//	tests := []struct {
-//		name           string
-//		recordingPaths []string
-//		expectReady bool
-//	}{
-//		{
-//			name:           "Pod added but not ready",
-//			recordingPaths: []string{workflow(added)},
-//			expectReady:    false,
-//		},
-//		{
-//			name:           "Pod scheduled but not ready",
-//			recordingPaths: []string{workflow(scheduled)},
-//			expectReady:    false,
-//		},
-//		{
-//			name:           "Pod create success",
-//			recordingPaths: []string{workflow(createSuccess)},
-//			expectReady:    true,
-//		},
-//		{
-//			name:           "Pod image pull error",
-//			recordingPaths: []string{workflow(imagePullError)},
-//			expectReady:    false,
-//		},
-//		{
-//			name:           "Pod create success after image pull failure resolved",
-//			recordingPaths: []string{workflow(imagePullError), workflow(imagePullErrorResolved)},
-//			expectReady:    true,
-//		},
-//		{
-//			name:           "Pod unscheduled",
-//			recordingPaths: []string{workflow(unscheduled)},
-//			expectReady:    false,
-//		},
-//		{
-//			name:           "Pod unready",
-//			recordingPaths: []string{workflow(unready)},
-//			expectReady:    false,
-//		},
-//		{
-//			name:           "Pod container terminated with error",
-//			recordingPaths: []string{workflow(containerTerminatedError)},
-//			expectReady:    false,
-//		},
-//		{
-//			name:           "Pod container terminated successfully",
-//			recordingPaths: []string{workflow(containerTerminatedSuccess)},
-//			expectReady:    false,
-//		},
-//		{
-//			name:           "Pod container terminated successfully with restartPolicy: Never",
-//			recordingPaths: []string{workflow(containerTerminatedSuccessRestartNever)},
-//			expectReady:    true,
-//		},
-//	}
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//			checker := NewPodChecker()
-//
-//			ready, messages := mustCheckIfRecordingsReady(tt.recordingPaths, checker)
-//			if ready != tt.expectReady {
-//				t.Errorf("Ready() = %t, want %t\nMessages: %s", ready, tt.expectReady, messages)
-//			}
-//		})
-//	}
-//}
+func Test_Pod_Checker(t *testing.T) {
+	workflow := func(name string) string {
+		return workflowPath(name)
+	}
+	const (
+		added                                  = "added"
+		containerTerminatedError               = "containerTerminatedError"
+		containerTerminatedSuccess             = "containerTerminatedSuccess"
+		containerTerminatedSuccessRestartNever = "containerTerminatedSuccessRestartNever"
+		createSuccess                          = "createSuccess"
+		imagePullError                         = "imagePullError"
+		imagePullErrorResolved                 = "imagePullErrorResolved"
+		scheduled                              = "scheduled"
+		unready                                = "unready"
+		unscheduled                            = "unscheduled"
+	)
+
+	tests := []struct {
+		name         string
+		workflowPath []string
+		expectReady  bool
+	}{
+		{
+			name:         "Pod added but not ready",
+			workflowPath: []string{workflow(added)},
+			expectReady:  false,
+		},
+		{
+			name:         "Pod scheduled but not ready",
+			workflowPath: []string{workflow(scheduled)},
+			expectReady:  false,
+		},
+		{
+			name:         "Pod create success",
+			workflowPath: []string{workflow(createSuccess)},
+			expectReady:  true,
+		},
+		{
+			name:         "Pod image pull error",
+			workflowPath: []string{workflow(imagePullError)},
+			expectReady:  false,
+		},
+		{
+			name:         "Pod create success after image pull failure resolved",
+			workflowPath: []string{workflow(imagePullError), workflow(imagePullErrorResolved)},
+			expectReady:  true,
+		},
+		{
+			name:         "Pod unscheduled",
+			workflowPath: []string{workflow(unscheduled)},
+			expectReady:  false,
+		},
+		{
+			name:         "Pod unready",
+			workflowPath: []string{workflow(unready)},
+			expectReady:  false,
+		},
+		{
+			name:         "Pod container terminated with error",
+			workflowPath: []string{workflow(containerTerminatedError)},
+			expectReady:  false,
+		},
+		{
+			name:         "Pod container terminated successfully",
+			workflowPath: []string{workflow(containerTerminatedSuccess)},
+			expectReady:  false,
+		},
+		{
+			name:         "Pod container terminated successfully with restartPolicy: Never",
+			workflowPath: []string{workflow(containerTerminatedSuccessRestartNever)},
+			expectReady:  true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			checker := NewPodChecker()
+
+			ready := false
+			for _, workflowPath := range tt.workflowPath {
+				podStates := loadWorkflow(t, workflowPath)
+				for _, podState := range podStates {
+					ready = checker.Ready(podState)
+				}
+			}
+			if ready != tt.expectReady {
+				t.Errorf("Ready() = %t, want %t", ready, tt.expectReady)
+			}
+		})
+	}
+}
 
 //
 // Helpers
@@ -219,4 +223,24 @@ func loadPod(t *testing.T, statePath string) *corev1.Pod {
 	require.NoError(t, err)
 
 	return &pod
+}
+
+func loadWorkflow(t *testing.T, workflowPath string) []*corev1.Pod {
+	jsonBytes, err := internal.TestStates.ReadFile(workflowPath)
+	require.NoError(t, err)
+
+	var pods []*corev1.Pod
+	states := kubernetes.MustLoadWorkflow(jsonBytes)
+	for _, state := range states {
+		pod := corev1.Pod{}
+		err = kubernetes.BuiltInScheme.Convert(state, &pod, nil)
+		require.NoError(t, err)
+		pods = append(pods, &pod)
+	}
+
+	return pods
+}
+
+func workflowPath(name string) string {
+	return fmt.Sprintf("workflows/kubernetes/pod/%s.json", name)
 }
