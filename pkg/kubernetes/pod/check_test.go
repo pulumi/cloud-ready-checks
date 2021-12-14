@@ -16,11 +16,11 @@ package pod
 
 import (
 	"fmt"
-	"github.com/pulumi/cloud-ready-checks/pkg/checker"
 	"testing"
 
 	"github.com/pulumi/cloud-ready-checks/internal"
-	"github.com/pulumi/cloud-ready-checks/pkg/kubernetes"
+	"github.com/pulumi/cloud-ready-checks/pkg/checker"
+	"github.com/pulumi/cloud-ready-checks/pkg/kubernetes/test"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 )
@@ -222,9 +222,9 @@ func loadPod(t *testing.T, statePath string) *corev1.Pod {
 	jsonBytes, err := internal.TestStates.ReadFile(statePath)
 	require.NoError(t, err)
 
-	state := kubernetes.MustLoadState(jsonBytes)
+	state := test.MustLoadState(jsonBytes)
 	pod := corev1.Pod{}
-	err = kubernetes.BuiltInScheme.Convert(state, &pod, nil)
+	err = test.BuiltInScheme.Convert(state, &pod, nil)
 	require.NoError(t, err)
 
 	return &pod
@@ -236,10 +236,10 @@ func loadWorkflows(t *testing.T, workflowPaths ...string) []*corev1.Pod {
 		jsonBytes, err := internal.TestStates.ReadFile(workflowPath)
 		require.NoError(t, err)
 
-		states := kubernetes.MustLoadWorkflow(jsonBytes)
+		states := test.MustLoadWorkflow(jsonBytes)
 		for _, state := range states {
 			pod := corev1.Pod{}
-			err = kubernetes.BuiltInScheme.Convert(state, &pod, nil)
+			err = test.BuiltInScheme.Convert(state, &pod, nil)
 			require.NoError(t, err)
 			pods = append(pods, &pod)
 		}
