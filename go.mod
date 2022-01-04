@@ -5,8 +5,8 @@ go 1.17
 require (
 	github.com/pulumi/pulumi/sdk/v3 v3.19.0
 	github.com/stretchr/testify v1.7.0
-	k8s.io/api v0.23.0
-	k8s.io/apimachinery v0.23.0
+	k8s.io/api v0.22.4
+	k8s.io/apimachinery v0.22.4
 )
 
 require (
@@ -30,7 +30,5 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	k8s.io/klog/v2 v2.30.0 // indirect
-	k8s.io/utils v0.0.0-20210930125809-cb0fa318a74b // indirect
-	sigs.k8s.io/json v0.0.0-20211020170558-c049b76a60c6 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.1.2 // indirect
 )
