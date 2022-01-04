@@ -16,5 +16,11 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: '1.16.x'
+      - name: Set up gotestfmt
+        uses: haveyoudebuggedit/gotestfmt-action@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Run tests
-        run: make test
+        run: |
+          set -euo pipefail
+          cd pkg && go test -v -json -count=1 -cover -timeout 5m -parallel 4 ./... 2>&1 | tee /tmp/gotest.log | gotestfmt
