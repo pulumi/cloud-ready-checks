@@ -50,6 +50,18 @@ func (rr Results) String() string {
 	return s.String()
 }
 
+// Messages iterates the Results and returns a slice of the underlying Message objects. Note that these messages are
+// not cached, so each invocation of this method will allocate memory for the slice.
+func (rr Results) Messages() logging.Messages {
+	var messages logging.Messages
+	for _, r := range rr {
+		if !r.Message.Empty() {
+			messages = append(messages, r.Message)
+		}
+	}
+	return messages
+}
+
 // Condition is a function that checks a state and returns a Result.
 type Condition func(state interface{}) Result
 
