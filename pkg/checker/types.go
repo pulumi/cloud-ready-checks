@@ -55,7 +55,9 @@ func (rr Results) String() string {
 func (rr Results) Messages() logging.Messages {
 	var messages logging.Messages
 	for _, r := range rr {
-		messages = append(messages, r.Message)
+		if !r.Message.Empty() {
+			messages = append(messages, r.Message)
+		}
 	}
 	return messages
 }
