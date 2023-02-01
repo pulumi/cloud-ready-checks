@@ -29,7 +29,12 @@ type Result struct {
 }
 
 func (r Result) String() string {
-	s := fmt.Sprintf("[%t] %s", r.Ok, r.Description)
+	var s string
+	if r.Ok {
+		s = fmt.Sprintf(`["done"] %s`, r.Description)
+	} else {
+		s = fmt.Sprintf(`["pending"] %s`, r.Description)
+	}
 
 	if !r.Message.Empty() {
 		s = fmt.Sprintf("%s -- %s", s, r.Message)
