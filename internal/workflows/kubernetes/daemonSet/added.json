@@ -1,341 +1,320 @@
 [
     {
-        "kind": "DaemonSet",
-        "apiVersion": "apps/v1",
-        "metadata": {
-            "name": "cadvisor",
-            "namespace": "cadvisor",
-            "uid": "8490cffb-d05e-43f1-9374-2904bb7dfa37",
-            "resourceVersion": "386827",
-            "generation": 1,
-            "creationTimestamp": "2023-04-25T15:57:39Z",
-            "labels": {
-                "app": "cadvisor"
+    "apiVersion": "apps/v1",
+    "kind": "DaemonSet",
+    "metadata": {
+      "annotations": {
+        "deprecated.daemonset.template.generation": "1",
+        "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apps/v1\",\"kind\":\"DaemonSet\",\"metadata\":{\"annotations\":{\"seccomp.security.alpha.kubernetes.io/pod\":\"docker/default\"},\"labels\":{\"app\":\"cadvisor\"},\"name\":\"cadvisor\",\"namespace\":\"cadvisor\"},\"spec\":{\"selector\":{\"matchLabels\":{\"app\":\"cadvisor\",\"name\":\"cadvisor\"}},\"template\":{\"metadata\":{\"labels\":{\"app\":\"cadvisor\",\"name\":\"cadvisor\"}},\"spec\":{\"automountServiceAccountToken\":false,\"containers\":[{\"image\":\"gcr.io/cadvisor/cadvisor:v0.47.0\",\"name\":\"cadvisor\",\"ports\":[{\"containerPort\":8080,\"name\":\"http\",\"protocol\":\"TCP\"}],\"resources\":{\"limits\":{\"cpu\":\"800m\",\"memory\":\"2000Mi\"},\"requests\":{\"cpu\":\"400m\",\"memory\":\"400Mi\"}},\"volumeMounts\":[{\"mountPath\":\"/rootfs\",\"name\":\"rootfs\",\"readOnly\":true},{\"mountPath\":\"/var/run\",\"name\":\"var-run\",\"readOnly\":true},{\"mountPath\":\"/sys\",\"name\":\"sys\",\"readOnly\":true},{\"mountPath\":\"/var/lib/docker\",\"name\":\"docker\",\"readOnly\":true},{\"mountPath\":\"/dev/disk\",\"name\":\"disk\",\"readOnly\":true}]}],\"serviceAccountName\":\"cadvisor\",\"terminationGracePeriodSeconds\":30,\"volumes\":[{\"hostPath\":{\"path\":\"/\"},\"name\":\"rootfs\"},{\"hostPath\":{\"path\":\"/var/run\"},\"name\":\"var-run\"},{\"hostPath\":{\"path\":\"/sys\"},\"name\":\"sys\"},{\"hostPath\":{\"path\":\"/var/lib/docker\"},\"name\":\"docker\"},{\"hostPath\":{\"path\":\"/dev/disk\"},\"name\":\"disk\"}]}}}}\n",
+        "seccomp.security.alpha.kubernetes.io/pod": "docker/default"
+      },
+      "creationTimestamp": "2023-04-25T19:12:41Z",
+      "generation": 1,
+      "labels": {
+        "app": "cadvisor"
+      },
+      "managedFields": [
+        {
+          "apiVersion": "apps/v1",
+          "fieldsType": "FieldsV1",
+          "fieldsV1": {
+            "f:metadata": {
+              "f:annotations": {
+                ".": {},
+                "f:deprecated.daemonset.template.generation": {},
+                "f:kubectl.kubernetes.io/last-applied-configuration": {},
+                "f:seccomp.security.alpha.kubernetes.io/pod": {}
+              },
+              "f:labels": {
+                ".": {},
+                "f:app": {}
+              }
             },
-            "annotations": {
-                "deprecated.daemonset.template.generation": "1",
-                "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apps/v1\",\"kind\":\"DaemonSet\",\"metadata\":{\"annotations\":{\"seccomp.security.alpha.kubernetes.io/pod\":\"docker/default\"},\"labels\":{\"app\":\"cadvisor\"},\"name\":\"cadvisor\",\"namespace\":\"cadvisor\"},\"spec\":{\"selector\":{\"matchLabels\":{\"app\":\"cadvisor\",\"name\":\"cadvisor\"}},\"template\":{\"metadata\":{\"labels\":{\"app\":\"cadvisor\",\"name\":\"cadvisor\"}},\"spec\":{\"automountServiceAccountToken\":false,\"containers\":[{\"image\":\"gcr.io/cadvisor/cadvisor:v0.47.0\",\"name\":\"cadvisor\",\"ports\":[{\"containerPort\":8080,\"name\":\"http\",\"protocol\":\"TCP\"}],\"resources\":{\"limits\":{\"cpu\":\"800m\",\"memory\":\"2000Mi\"},\"requests\":{\"cpu\":\"400m\",\"memory\":\"400Mi\"}},\"volumeMounts\":[{\"mountPath\":\"/rootfs\",\"name\":\"rootfs\",\"readOnly\":true},{\"mountPath\":\"/var/run\",\"name\":\"var-run\",\"readOnly\":true},{\"mountPath\":\"/sys\",\"name\":\"sys\",\"readOnly\":true},{\"mountPath\":\"/var/lib/docker\",\"name\":\"docker\",\"readOnly\":true},{\"mountPath\":\"/dev/disk\",\"name\":\"disk\",\"readOnly\":true}]}],\"serviceAccountName\":\"cadvisor\",\"terminationGracePeriodSeconds\":30,\"volumes\":[{\"hostPath\":{\"path\":\"/\"},\"name\":\"rootfs\"},{\"hostPath\":{\"path\":\"/var/run\"},\"name\":\"var-run\"},{\"hostPath\":{\"path\":\"/sys\"},\"name\":\"sys\"},{\"hostPath\":{\"path\":\"/var/lib/docker\"},\"name\":\"docker\"},{\"hostPath\":{\"path\":\"/dev/disk\"},\"name\":\"disk\"}]}}}}\n",
-                "seccomp.security.alpha.kubernetes.io/pod": "docker/default"
-            },
-            "managedFields": [
-                {
-                    "manager": "kubectl-client-side-apply",
-                    "operation": "Update",
-                    "apiVersion": "apps/v1",
-                    "time": "2023-04-25T15:57:39Z",
-                    "fieldsType": "FieldsV1",
-                    "fieldsV1": {
-                        "f:metadata": {
-                            "f:annotations": {
-                                ".": {},
-                                "f:deprecated.daemonset.template.generation": {},
-                                "f:kubectl.kubernetes.io/last-applied-configuration": {},
-                                "f:seccomp.security.alpha.kubernetes.io/pod": {}
-                            },
-                            "f:labels": {
-                                ".": {},
-                                "f:app": {}
-                            }
-                        },
-                        "f:spec": {
-                            "f:revisionHistoryLimit": {},
-                            "f:selector": {},
-                            "f:template": {
-                                "f:metadata": {
-                                    "f:labels": {
-                                        ".": {},
-                                        "f:app": {},
-                                        "f:name": {}
-                                    }
-                                },
-                                "f:spec": {
-                                    "f:automountServiceAccountToken": {},
-                                    "f:containers": {
-                                        "k:{\"name\":\"cadvisor\"}": {
-                                            ".": {},
-                                            "f:image": {},
-                                            "f:imagePullPolicy": {},
-                                            "f:name": {},
-                                            "f:ports": {
-                                                ".": {},
-                                                "k:{\"containerPort\":8080,\"protocol\":\"TCP\"}": {
-                                                    ".": {},
-                                                    "f:containerPort": {},
-                                                    "f:name": {},
-                                                    "f:protocol": {}
-                                                }
-                                            },
-                                            "f:resources": {
-                                                ".": {},
-                                                "f:limits": {
-                                                    ".": {},
-                                                    "f:cpu": {},
-                                                    "f:memory": {}
-                                                },
-                                                "f:requests": {
-                                                    ".": {},
-                                                    "f:cpu": {},
-                                                    "f:memory": {}
-                                                }
-                                            },
-                                            "f:terminationMessagePath": {},
-                                            "f:terminationMessagePolicy": {},
-                                            "f:volumeMounts": {
-                                                ".": {},
-                                                "k:{\"mountPath\":\"/dev/disk\"}": {
-                                                    ".": {},
-                                                    "f:mountPath": {},
-                                                    "f:name": {},
-                                                    "f:readOnly": {}
-                                                },
-                                                "k:{\"mountPath\":\"/rootfs\"}": {
-                                                    ".": {},
-                                                    "f:mountPath": {},
-                                                    "f:name": {},
-                                                    "f:readOnly": {}
-                                                },
-                                                "k:{\"mountPath\":\"/sys\"}": {
-                                                    ".": {},
-                                                    "f:mountPath": {},
-                                                    "f:name": {},
-                                                    "f:readOnly": {}
-                                                },
-                                                "k:{\"mountPath\":\"/var/lib/docker\"}": {
-                                                    ".": {},
-                                                    "f:mountPath": {},
-                                                    "f:name": {},
-                                                    "f:readOnly": {}
-                                                },
-                                                "k:{\"mountPath\":\"/var/run\"}": {
-                                                    ".": {},
-                                                    "f:mountPath": {},
-                                                    "f:name": {},
-                                                    "f:readOnly": {}
-                                                }
-                                            }
-                                        }
-                                    },
-                                    "f:dnsPolicy": {},
-                                    "f:restartPolicy": {},
-                                    "f:schedulerName": {},
-                                    "f:securityContext": {},
-                                    "f:serviceAccount": {},
-                                    "f:serviceAccountName": {},
-                                    "f:terminationGracePeriodSeconds": {},
-                                    "f:volumes": {
-                                        ".": {},
-                                        "k:{\"name\":\"disk\"}": {
-                                            ".": {},
-                                            "f:hostPath": {
-                                                ".": {},
-                                                "f:path": {},
-                                                "f:type": {}
-                                            },
-                                            "f:name": {}
-                                        },
-                                        "k:{\"name\":\"docker\"}": {
-                                            ".": {},
-                                            "f:hostPath": {
-                                                ".": {},
-                                                "f:path": {},
-                                                "f:type": {}
-                                            },
-                                            "f:name": {}
-                                        },
-                                        "k:{\"name\":\"rootfs\"}": {
-                                            ".": {},
-                                            "f:hostPath": {
-                                                ".": {},
-                                                "f:path": {},
-                                                "f:type": {}
-                                            },
-                                            "f:name": {}
-                                        },
-                                        "k:{\"name\":\"sys\"}": {
-                                            ".": {},
-                                            "f:hostPath": {
-                                                ".": {},
-                                                "f:path": {},
-                                                "f:type": {}
-                                            },
-                                            "f:name": {}
-                                        },
-                                        "k:{\"name\":\"var-run\"}": {
-                                            ".": {},
-                                            "f:hostPath": {
-                                                ".": {},
-                                                "f:path": {},
-                                                "f:type": {}
-                                            },
-                                            "f:name": {}
-                                        }
-                                    }
-                                }
-                            },
-                            "f:updateStrategy": {
-                                "f:rollingUpdate": {
-                                    ".": {},
-                                    "f:maxSurge": {},
-                                    "f:maxUnavailable": {}
-                                },
-                                "f:type": {}
-                            }
-                        }
-                    }
+            "f:spec": {
+              "f:revisionHistoryLimit": {},
+              "f:selector": {},
+              "f:template": {
+                "f:metadata": {
+                  "f:labels": {
+                    ".": {},
+                    "f:app": {},
+                    "f:name": {}
+                  }
                 },
-                {
-                    "manager": "k3s",
-                    "operation": "Update",
-                    "apiVersion": "apps/v1",
-                    "time": "2023-04-25T15:57:43Z",
-                    "fieldsType": "FieldsV1",
-                    "fieldsV1": {
-                        "f:status": {
-                            "f:currentNumberScheduled": {},
-                            "f:desiredNumberScheduled": {},
-                            "f:numberAvailable": {},
-                            "f:numberReady": {},
-                            "f:observedGeneration": {},
-                            "f:updatedNumberScheduled": {}
+                "f:spec": {
+                  "f:automountServiceAccountToken": {},
+                  "f:containers": {
+                    "k:{\"name\":\"cadvisor\"}": {
+                      ".": {},
+                      "f:image": {},
+                      "f:imagePullPolicy": {},
+                      "f:name": {},
+                      "f:ports": {
+                        ".": {},
+                        "k:{\"containerPort\":8080,\"protocol\":\"TCP\"}": {
+                          ".": {},
+                          "f:containerPort": {},
+                          "f:name": {},
+                          "f:protocol": {}
                         }
+                      },
+                      "f:resources": {
+                        ".": {},
+                        "f:limits": {
+                          ".": {},
+                          "f:cpu": {},
+                          "f:memory": {}
+                        },
+                        "f:requests": {
+                          ".": {},
+                          "f:cpu": {},
+                          "f:memory": {}
+                        }
+                      },
+                      "f:terminationMessagePath": {},
+                      "f:terminationMessagePolicy": {},
+                      "f:volumeMounts": {
+                        ".": {},
+                        "k:{\"mountPath\":\"/dev/disk\"}": {
+                          ".": {},
+                          "f:mountPath": {},
+                          "f:name": {},
+                          "f:readOnly": {}
+                        },
+                        "k:{\"mountPath\":\"/rootfs\"}": {
+                          ".": {},
+                          "f:mountPath": {},
+                          "f:name": {},
+                          "f:readOnly": {}
+                        },
+                        "k:{\"mountPath\":\"/sys\"}": {
+                          ".": {},
+                          "f:mountPath": {},
+                          "f:name": {},
+                          "f:readOnly": {}
+                        },
+                        "k:{\"mountPath\":\"/var/lib/docker\"}": {
+                          ".": {},
+                          "f:mountPath": {},
+                          "f:name": {},
+                          "f:readOnly": {}
+                        },
+                        "k:{\"mountPath\":\"/var/run\"}": {
+                          ".": {},
+                          "f:mountPath": {},
+                          "f:name": {},
+                          "f:readOnly": {}
+                        }
+                      }
+                    }
+                  },
+                  "f:dnsPolicy": {},
+                  "f:restartPolicy": {},
+                  "f:schedulerName": {},
+                  "f:securityContext": {},
+                  "f:serviceAccount": {},
+                  "f:serviceAccountName": {},
+                  "f:terminationGracePeriodSeconds": {},
+                  "f:volumes": {
+                    ".": {},
+                    "k:{\"name\":\"disk\"}": {
+                      ".": {},
+                      "f:hostPath": {
+                        ".": {},
+                        "f:path": {},
+                        "f:type": {}
+                      },
+                      "f:name": {}
                     },
-                    "subresource": "status"
+                    "k:{\"name\":\"docker\"}": {
+                      ".": {},
+                      "f:hostPath": {
+                        ".": {},
+                        "f:path": {},
+                        "f:type": {}
+                      },
+                      "f:name": {}
+                    },
+                    "k:{\"name\":\"rootfs\"}": {
+                      ".": {},
+                      "f:hostPath": {
+                        ".": {},
+                        "f:path": {},
+                        "f:type": {}
+                      },
+                      "f:name": {}
+                    },
+                    "k:{\"name\":\"sys\"}": {
+                      ".": {},
+                      "f:hostPath": {
+                        ".": {},
+                        "f:path": {},
+                        "f:type": {}
+                      },
+                      "f:name": {}
+                    },
+                    "k:{\"name\":\"var-run\"}": {
+                      ".": {},
+                      "f:hostPath": {
+                        ".": {},
+                        "f:path": {},
+                        "f:type": {}
+                      },
+                      "f:name": {}
+                    }
+                  }
                 }
-            ]
+              },
+              "f:updateStrategy": {
+                "f:rollingUpdate": {
+                  ".": {},
+                  "f:maxSurge": {},
+                  "f:maxUnavailable": {}
+                },
+                "f:type": {}
+              }
+            }
+          },
+          "manager": "kubectl-client-side-apply",
+          "operation": "Update",
+          "time": "2023-04-25T19:12:41Z"
+        }
+      ],
+      "name": "cadvisor",
+      "namespace": "cadvisor",
+      "resourceVersion": "397339",
+      "uid": "d7778638-4f87-44a5-b24e-f7f488ecd5d2"
+    },
+    "spec": {
+      "revisionHistoryLimit": 10,
+      "selector": {
+        "matchLabels": {
+          "app": "cadvisor",
+          "name": "cadvisor"
+        }
+      },
+      "template": {
+        "metadata": {
+          "creationTimestamp": null,
+          "labels": {
+            "app": "cadvisor",
+            "name": "cadvisor"
+          }
         },
         "spec": {
-            "selector": {
-                "matchLabels": {
-                    "app": "cadvisor",
-                    "name": "cadvisor"
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "image": "gcr.io/cadvisor/cadvisor:v0.47.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "cadvisor",
+              "ports": [
+                {
+                  "containerPort": 8080,
+                  "name": "http",
+                  "protocol": "TCP"
                 }
-            },
-            "template": {
-                "metadata": {
-                    "creationTimestamp": null,
-                    "labels": {
-                        "app": "cadvisor",
-                        "name": "cadvisor"
-                    }
+              ],
+              "resources": {
+                "limits": {
+                  "cpu": "800m",
+                  "memory": "2000Mi"
                 },
-                "spec": {
-                    "volumes": [
-                        {
-                            "name": "rootfs",
-                            "hostPath": {
-                                "path": "/",
-                                "type": ""
-                            }
-                        },
-                        {
-                            "name": "var-run",
-                            "hostPath": {
-                                "path": "/var/run",
-                                "type": ""
-                            }
-                        },
-                        {
-                            "name": "sys",
-                            "hostPath": {
-                                "path": "/sys",
-                                "type": ""
-                            }
-                        },
-                        {
-                            "name": "docker",
-                            "hostPath": {
-                                "path": "/var/lib/docker",
-                                "type": ""
-                            }
-                        },
-                        {
-                            "name": "disk",
-                            "hostPath": {
-                                "path": "/dev/disk",
-                                "type": ""
-                            }
-                        }
-                    ],
-                    "containers": [
-                        {
-                            "name": "cadvisor",
-                            "image": "gcr.io/cadvisor/cadvisor:v0.47.0",
-                            "ports": [
-                                {
-                                    "name": "http",
-                                    "containerPort": 8080,
-                                    "protocol": "TCP"
-                                }
-                            ],
-                            "resources": {
-                                "limits": {
-                                    "cpu": "800m",
-                                    "memory": "2000Mi"
-                                },
-                                "requests": {
-                                    "cpu": "400m",
-                                    "memory": "400Mi"
-                                }
-                            },
-                            "volumeMounts": [
-                                {
-                                    "name": "rootfs",
-                                    "readOnly": true,
-                                    "mountPath": "/rootfs"
-                                },
-                                {
-                                    "name": "var-run",
-                                    "readOnly": true,
-                                    "mountPath": "/var/run"
-                                },
-                                {
-                                    "name": "sys",
-                                    "readOnly": true,
-                                    "mountPath": "/sys"
-                                },
-                                {
-                                    "name": "docker",
-                                    "readOnly": true,
-                                    "mountPath": "/var/lib/docker"
-                                },
-                                {
-                                    "name": "disk",
-                                    "readOnly": true,
-                                    "mountPath": "/dev/disk"
-                                }
-                            ],
-                            "terminationMessagePath": "/dev/termination-log",
-                            "terminationMessagePolicy": "File",
-                            "imagePullPolicy": "IfNotPresent"
-                        }
-                    ],
-                    "restartPolicy": "Always",
-                    "terminationGracePeriodSeconds": 30,
-                    "dnsPolicy": "ClusterFirst",
-                    "serviceAccountName": "cadvisor",
-                    "serviceAccount": "cadvisor",
-                    "automountServiceAccountToken": false,
-                    "securityContext": {},
-                    "schedulerName": "default-scheduler"
+                "requests": {
+                  "cpu": "400m",
+                  "memory": "400Mi"
                 }
-            },
-            "updateStrategy": {
-                "type": "RollingUpdate",
-                "rollingUpdate": {
-                    "maxUnavailable": 1,
-                    "maxSurge": 0
+              },
+              "terminationMessagePath": "/dev/termination-log",
+              "terminationMessagePolicy": "File",
+              "volumeMounts": [
+                {
+                  "mountPath": "/rootfs",
+                  "name": "rootfs",
+                  "readOnly": true
+                },
+                {
+                  "mountPath": "/var/run",
+                  "name": "var-run",
+                  "readOnly": true
+                },
+                {
+                  "mountPath": "/sys",
+                  "name": "sys",
+                  "readOnly": true
+                },
+                {
+                  "mountPath": "/var/lib/docker",
+                  "name": "docker",
+                  "readOnly": true
+                },
+                {
+                  "mountPath": "/dev/disk",
+                  "name": "disk",
+                  "readOnly": true
                 }
+              ]
+            }
+          ],
+          "dnsPolicy": "ClusterFirst",
+          "restartPolicy": "Always",
+          "schedulerName": "default-scheduler",
+          "securityContext": {},
+          "serviceAccount": "cadvisor",
+          "serviceAccountName": "cadvisor",
+          "terminationGracePeriodSeconds": 30,
+          "volumes": [
+            {
+              "hostPath": {
+                "path": "/",
+                "type": ""
+              },
+              "name": "rootfs"
             },
-            "revisionHistoryLimit": 10
-        },
-        "status": {
-            "currentNumberScheduled": 3,
-            "numberMisscheduled": 0,
-            "desiredNumberScheduled": 3,
-            "numberReady": 3,
-            "observedGeneration": 1,
-            "updatedNumberScheduled": 3,
-            "numberAvailable": 3
+            {
+              "hostPath": {
+                "path": "/var/run",
+                "type": ""
+              },
+              "name": "var-run"
+            },
+            {
+              "hostPath": {
+                "path": "/sys",
+                "type": ""
+              },
+              "name": "sys"
+            },
+            {
+              "hostPath": {
+                "path": "/var/lib/docker",
+                "type": ""
+              },
+              "name": "docker"
+            },
+            {
+              "hostPath": {
+                "path": "/dev/disk",
+                "type": ""
+              },
+              "name": "disk"
+            }
+          ]
         }
+      },
+      "updateStrategy": {
+        "rollingUpdate": {
+          "maxSurge": 0,
+          "maxUnavailable": 1
+        },
+        "type": "RollingUpdate"
+      }
+    },
+    "status": {
+      "currentNumberScheduled": 0,
+      "desiredNumberScheduled": 0,
+      "numberMisscheduled": 0,
+      "numberReady": 0
     }
+  }
 ]

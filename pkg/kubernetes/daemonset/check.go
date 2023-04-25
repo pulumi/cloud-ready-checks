@@ -48,11 +48,11 @@ func daemonSetReady(obj interface{}) checker.Result {
 	daemonSet := obj.(*appsv1.DaemonSet)
 	result := checker.Result{Description: fmt.Sprintf(
 		"Waiting for daemonSet %q to be ready", kubernetes.FullyQualifiedName(daemonSet))}
-
-	if daemonSet.Status.NumberAvailable == daemonSet.Status.DesiredNumberScheduled {
-		result.Ok = true
+	if daemonSet.Status.DesiredNumberScheduled > 0 {
+		if daemonSet.Status.NumberAvailable == daemonSet.Status.DesiredNumberScheduled {
+			result.Ok = true
+		}
 	}
-
 	return result
 }
 
