@@ -1,9 +1,8 @@
-CHANGELOG
-=========
+# CHANGELOG
 
 ## HEAD (Unreleased)
 
----
+- Adding in support for Daemonsets
 
 ## 1.1.0 (2022-12-13)
 
