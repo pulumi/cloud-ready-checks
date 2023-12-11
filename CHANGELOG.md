@@ -2,7 +2,8 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)
+
+- Upgrade Go to v1.21 (https://github.com/pulumi/cloud-ready-checks/pull/5)
 
 ---
 

@@ -1,6 +1,6 @@
 module github.com/pulumi/cloud-ready-checks
 
-go 1.17
+go 1.21
 
 require (
 	github.com/pulumi/pulumi/sdk/v3 v3.19.0
