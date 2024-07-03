@@ -8,9 +8,6 @@ updates:
       pulumi:
         patterns:
           - "github.com/pulumi/*"
-      k8s:
-        patterns:
-          - "k8s.io/*"
       security:
         applies-to: security-updates
         patterns:
