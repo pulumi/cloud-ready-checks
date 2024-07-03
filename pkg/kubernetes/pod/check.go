@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/pulumi/cloud-ready-checks/pkg/checker"
 	"github.com/pulumi/cloud-ready-checks/pkg/checker/logging"
@@ -164,7 +165,7 @@ func containerLastTerminationState(status corev1.ContainerStatus) error {
 	}
 
 	err := fmt.Errorf("Container %q terminated at %s (%s: exit code %d)",
-		status.Name, terminated.FinishedAt, terminated.Reason, terminated.ExitCode,
+		status.Name, terminated.FinishedAt.UTC().Format(time.RFC3339Nano), terminated.Reason, terminated.ExitCode,
 	)
 
 	if terminated.Message != "" {

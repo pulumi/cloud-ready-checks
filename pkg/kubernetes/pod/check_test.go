@@ -201,7 +201,7 @@ func Test_Pod_Checker(t *testing.T) {
 			name:          "crashLoopBackoff",
 			workflowPaths: []string{workflow(crashLoopBackoff)},
 			expectReady:   false,
-			expectMessage: `Container "crash" terminated at 2024-07-03 11:34:11 -0700 PDT (Error: exit code 1)`,
+			expectMessage: `Container "crash" terminated at 2024-07-03T18:34:11Z (Error: exit code 1)`,
 		},
 		{
 			name:          "crashLoopBackoff with FallbackToLogsOnError",
