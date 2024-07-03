@@ -1,0 +1,20 @@
+version: 2
+updates:
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: daily
+    groups:
+      pulumi:
+        patterns:
+          - "github.com/pulumi/*"
+      k8s:
+        patterns:
+          - "k8s.io/*"
+      security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+    labels:
+      - dependencies
+      - impact/no-changelog-required
