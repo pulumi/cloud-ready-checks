@@ -15,12 +15,10 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v4
         with:
-          go-version: "1.21.x"
-      - name: Set up gotestfmt
-        uses: GoTestTools/gotestfmt-action@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          go-version-file: go.mod
       - name: Run tests
-        run: |
-          set -euo pipefail
-          cd pkg && go test -v -json -count=1 -cover -timeout 5m -parallel 4 ./... 2>&1 | tee /tmp/gotest.log | gotestfmt
+        run: make test
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
