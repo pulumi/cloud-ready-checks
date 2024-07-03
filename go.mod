@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/pulumi/pulumi/sdk/v3 v3.96.2
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	k8s.io/api v0.29.0
 	k8s.io/apimachinery v0.29.0
 )
