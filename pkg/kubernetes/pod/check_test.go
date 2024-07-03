@@ -21,6 +21,7 @@ import (
 	"github.com/pulumi/cloud-ready-checks/internal"
 	"github.com/pulumi/cloud-ready-checks/pkg/checker"
 	"github.com/pulumi/cloud-ready-checks/pkg/kubernetes/test"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 )
@@ -124,22 +125,25 @@ func Test_Pod_Checker(t *testing.T) {
 		return workflowPath(name)
 	}
 	const (
-		added                                  = "added"
-		containerTerminatedError               = "containerTerminatedError"
-		containerTerminatedSuccess             = "containerTerminatedSuccess"
-		containerTerminatedSuccessRestartNever = "containerTerminatedSuccessRestartNever"
-		createSuccess                          = "createSuccess"
-		imagePullError                         = "imagePullError"
-		imagePullErrorResolved                 = "imagePullErrorResolved"
-		scheduled                              = "scheduled"
-		unready                                = "unready"
-		unscheduled                            = "unscheduled"
+		added                                     = "added"
+		containerTerminatedError                  = "containerTerminatedError"
+		containerTerminatedSuccess                = "containerTerminatedSuccess"
+		containerTerminatedSuccessRestartNever    = "containerTerminatedSuccessRestartNever"
+		createSuccess                             = "createSuccess"
+		imagePullError                            = "imagePullError"
+		imagePullErrorResolved                    = "imagePullErrorResolved"
+		scheduled                                 = "scheduled"
+		unready                                   = "unready"
+		unscheduled                               = "unscheduled"
+		crashLoopBackoff                          = "crashLoopBackoff"
+		crashLoopBackoffWithFallbackToLogsOnError = "crashLoopBackoffWithFallbackToLogsOnError"
 	)
 
 	tests := []struct {
 		name          string
 		workflowPaths []string
 		expectReady   bool
+		expectMessage string
 	}{
 		{
 			name:          "Pod added but not ready",
@@ -170,6 +174,7 @@ func Test_Pod_Checker(t *testing.T) {
 			name:          "Pod unscheduled",
 			workflowPaths: []string{workflow(unscheduled)},
 			expectReady:   false,
+			expectMessage: "1 Insufficient memory.",
 		},
 		{
 			name:          "Pod unready",
@@ -180,6 +185,7 @@ func Test_Pod_Checker(t *testing.T) {
 			name:          "Pod container terminated with error",
 			workflowPaths: []string{workflow(containerTerminatedError)},
 			expectReady:   false,
+			expectMessage: "executable file not found in $PATH",
 		},
 		{
 			name:          "Pod container terminated successfully",
@@ -190,6 +196,18 @@ func Test_Pod_Checker(t *testing.T) {
 			name:          "Pod container terminated successfully with restartPolicy: Never",
 			workflowPaths: []string{workflow(containerTerminatedSuccessRestartNever)},
 			expectReady:   true,
+		},
+		{
+			name:          "crashLoopBackoff",
+			workflowPaths: []string{workflow(crashLoopBackoff)},
+			expectReady:   false,
+			expectMessage: `Container "crash" terminated at 2024-07-03 11:34:11 -0700 PDT (Error: exit code 1)`,
+		},
+		{
+			name:          "crashLoopBackoff with FallbackToLogsOnError",
+			workflowPaths: []string{workflow(crashLoopBackoffWithFallbackToLogsOnError)},
+			expectReady:   false,
+			expectMessage: "see ya!",
 		},
 	}
 	for _, tt := range tests {
@@ -205,10 +223,10 @@ func Test_Pod_Checker(t *testing.T) {
 					break
 				}
 			}
-			fmt.Printf("Expect Ready() = %t\n", tt.expectReady)
 			fmt.Println(details)
-			if ready != tt.expectReady {
-				t.Errorf("Ready() = %t, want %t", ready, tt.expectReady)
+			assert.Equal(t, tt.expectReady, ready)
+			if tt.expectMessage != "" {
+				assert.Contains(t, details.String(), tt.expectMessage)
 			}
 		})
 	}
