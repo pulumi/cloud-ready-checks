@@ -15,8 +15,10 @@
 package pod
 
 import (
+	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/pulumi/cloud-ready-checks/pkg/checker"
 	"github.com/pulumi/cloud-ready-checks/pkg/checker/logging"
@@ -64,13 +66,11 @@ func podInitialized(obj interface{}) checker.Result {
 		case corev1.ConditionTrue:
 			result.Ok = true
 		default:
-			var errs []string
+			var err error
 			for _, status := range pod.Status.ContainerStatuses {
-				if ok, containerErrs := hasContainerStatusErrors(status); !ok {
-					errs = append(errs, containerErrs...)
-				}
+				err = errors.Join(err, containerStatusErrors(status))
 			}
-			result.Message = logging.WarningMessage(podError(condition, errs, kubernetes.FullyQualifiedName(pod)))
+			result.Message = logging.WarningMessage(podError(condition, err, kubernetes.FullyQualifiedName(pod)))
 		}
 	}
 
@@ -91,8 +91,8 @@ func podReady(obj interface{}) checker.Result {
 			case corev1.PodSucceeded: // If the Pod has terminated, but .status.phase is "Succeeded", consider it Ready.
 				result.Ok = true
 			default:
-				errs := collectContainerStatusErrors(pod.Status.ContainerStatuses)
-				result.Message = logging.WarningMessage(podError(condition, errs, kubernetes.FullyQualifiedName(pod)))
+				err := collectContainerStatusErrors(pod.Status.ContainerStatuses)
+				result.Message = logging.WarningMessage(podError(condition, err, kubernetes.FullyQualifiedName(pod)))
 			}
 		}
 	}
@@ -104,64 +104,74 @@ func podReady(obj interface{}) checker.Result {
 // Helpers
 //
 
-func collectContainerStatusErrors(statuses []corev1.ContainerStatus) []string {
-	var errs []string
+func collectContainerStatusErrors(statuses []corev1.ContainerStatus) error {
+	var err error
 	for _, status := range statuses {
-		if hasErr, containerErrs := hasContainerStatusErrors(status); hasErr {
-			errs = append(errs, containerErrs...)
-		}
+		err = errors.Join(err, containerStatusErrors(status))
 	}
 
-	return errs
+	return err
 }
 
-func hasContainerStatusErrors(status corev1.ContainerStatus) (bool, []string) {
+func containerStatusErrors(status corev1.ContainerStatus) error {
 	if status.Ready {
-		return false, nil
+		return nil
 	}
 
-	var errs []string
-	if hasErr, err := hasContainerWaitingError(status); hasErr {
-		errs = append(errs, err)
-	}
-	if hasErr, err := hasContainerTerminatedError(status); hasErr {
-		errs = append(errs, err)
-	}
-
-	return len(errs) > 0, errs
+	var err error
+	err = errors.Join(err, containerWaitingError(status))
+	err = errors.Join(err, containerTerminatedError(status))
+	err = errors.Join(err, containerLastTerminationState(status))
+	return err
 }
 
-func hasContainerWaitingError(status corev1.ContainerStatus) (bool, string) {
+func containerWaitingError(status corev1.ContainerStatus) error {
 	state := status.State.Waiting
 	if state == nil {
-		return false, ""
+		return nil
 	}
 
-	// Return false if the container is creating.
+	// Return no error if the container is creating.
 	if state.Reason == "ContainerCreating" {
-		return false, ""
+		return nil
 	}
 
 	msg := fmt.Sprintf("[%s] %s", state.Reason, trimImagePullMsg(state.Message))
-	return true, msg
+	return fmt.Errorf(msg)
 }
 
-func hasContainerTerminatedError(status corev1.ContainerStatus) (bool, string) {
+func containerTerminatedError(status corev1.ContainerStatus) error {
 	state := status.State.Terminated
 	if state == nil {
-		return false, ""
+		return nil
 	}
 
 	// Return false if no reason given.
 	if len(state.Reason) == 0 {
-		return false, ""
+		return nil
 	}
 
 	if len(state.Message) > 0 {
 		msg := fmt.Sprintf("[%s] %s", state.Reason, trimImagePullMsg(state.Message))
-		return true, msg
+		return fmt.Errorf(msg)
 	}
-	return true, fmt.Sprintf("Container %q completed with exit code %d", status.Name, state.ExitCode)
+	return fmt.Errorf("Container %q completed with exit code %d", status.Name, state.ExitCode)
+}
+
+func containerLastTerminationState(status corev1.ContainerStatus) error {
+	terminated := status.LastTerminationState.Terminated
+	if terminated == nil {
+		return nil
+	}
+
+	err := fmt.Errorf("Container %q terminated at %s (%s: exit code %d)",
+		status.Name, terminated.FinishedAt.UTC().Format(time.RFC3339Nano), terminated.Reason, terminated.ExitCode,
+	)
+
+	if terminated.Message != "" {
+		err = errors.Join(err, fmt.Errorf(terminated.Message))
+	}
+	return err
 }
 
 // trimImagePullMsg trims unhelpful error from ImagePullError status messages.
@@ -190,15 +200,13 @@ func filterConditions(conditions []corev1.PodCondition, desired corev1.PodCondit
 	return nil, false
 }
 
-func podError(condition *corev1.PodCondition, errs []string, name string) string {
+func podError(condition *corev1.PodCondition, err error, name string) string {
 	errMsg := fmt.Sprintf("[Pod %s]: ", name)
 	if len(condition.Reason) > 0 && len(condition.Message) > 0 {
 		errMsg += condition.Message
 	}
-
-	for _, err := range errs {
-		errMsg += fmt.Sprintf(" -- %s", err)
+	if err != nil {
+		errMsg += err.Error()
 	}
-
 	return errMsg
 }
