@@ -133,6 +133,7 @@ func Test_Pod_Checker(t *testing.T) {
 		imagePullError                            = "imagePullError"
 		imagePullErrorResolved                    = "imagePullErrorResolved"
 		scheduled                                 = "scheduled"
+		unavailable                               = "unavailable"
 		unready                                   = "unready"
 		unscheduled                               = "unscheduled"
 		crashLoopBackoff                          = "crashLoopBackoff"
@@ -149,48 +150,76 @@ func Test_Pod_Checker(t *testing.T) {
 			name:          "Pod added but not ready",
 			workflowPaths: []string{workflow(added)},
 			expectReady:   false,
+			expectMessage: `Waiting for Pod "foo" to be scheduled
+`,
 		},
 		{
-			name:          "Pod scheduled but not ready",
+			name:          "Pod scheduled but not initialized",
 			workflowPaths: []string{workflow(scheduled)},
 			expectReady:   false,
+			expectMessage: `Waiting for Pod "foo" to be initialized
+`,
 		},
 		{
 			name:          "Pod create success",
 			workflowPaths: []string{workflow(createSuccess)},
 			expectReady:   true,
+			expectMessage: `["done"] Waiting for Pod "foo" to be scheduled
+["done"] Waiting for Pod "foo" to be initialized
+["done"] Waiting for Pod "foo" to be ready
+`,
 		},
 		{
 			name:          "Pod image pull error",
 			workflowPaths: []string{workflow(imagePullError)},
 			expectReady:   false,
+			expectMessage: `[Pod foo]: containers with unready status: [nginx][ImagePullBackOff] Back-off pulling image "nginx:1.13-invalid"
+`,
 		},
 		{
 			name:          "Pod create success after image pull failure resolved",
 			workflowPaths: []string{workflow(imagePullError), workflow(imagePullErrorResolved)},
 			expectReady:   true,
+			expectMessage: `["done"] Waiting for Pod "foo" to be scheduled
+["done"] Waiting for Pod "foo" to be initialized
+["done"] Waiting for Pod "foo" to be ready
+`,
 		},
 		{
 			name:          "Pod unscheduled",
 			workflowPaths: []string{workflow(unscheduled)},
 			expectReady:   false,
-			expectMessage: "1 Insufficient memory.",
+			expectMessage: ` Waiting for Pod "foo" to be scheduled -- 0/1 nodes are available: 1 Insufficient memory.
+`,
 		},
 		{
 			name:          "Pod unready",
 			workflowPaths: []string{workflow(unready)},
 			expectReady:   false,
+			expectMessage: `[Pod foo]: containers with unready status: [nginx]
+`,
+		},
+		{
+			name:          "Pod unavailable",
+			workflowPaths: []string{workflow(unavailable)},
+			expectReady:   false,
+			expectMessage: `Waiting for Pod "foo" to be ready
+`,
 		},
 		{
 			name:          "Pod container terminated with error",
 			workflowPaths: []string{workflow(containerTerminatedError)},
 			expectReady:   false,
-			expectMessage: "executable file not found in $PATH",
+			expectMessage: `[Pod foo]: containers with unready status: [nginx][RunContainerError] failed to start container "12a0e6de476b459c53094e9bd25cc7df5c587a4140eee5008c29dee3d92c94c1": Error response from daemon: OCI runtime create failed: container_linux.go:345: starting container process caused "exec: \"echo foo\": executable file not found in $PATH": unknown
+`,
 		},
 		{
 			name:          "Pod container terminated successfully",
 			workflowPaths: []string{workflow(containerTerminatedSuccess)},
 			expectReady:   false,
+			expectMessage: `[Pod foo]: containers with unready status: [nginx][CrashLoopBackOff] Back-off 10s restarting failed container=nginx pod=foo_default(9e080db4-978b-11e9-a3c5-025000000001)
+Container "nginx" terminated at 2019-06-25T20:55:54Z (Completed: exit code 0)
+`,
 		},
 		{
 			name:          "Pod container terminated successfully with restartPolicy: Never",
@@ -201,13 +230,17 @@ func Test_Pod_Checker(t *testing.T) {
 			name:          "crashLoopBackoff",
 			workflowPaths: []string{workflow(crashLoopBackoff)},
 			expectReady:   false,
-			expectMessage: `Container "crash" terminated at 2024-07-03T18:34:11Z (Error: exit code 1)`,
+			expectMessage: `Container "crash" terminated at 2024-07-03T18:34:11Z (Error: exit code 1)
+`,
 		},
 		{
 			name:          "crashLoopBackoff with FallbackToLogsOnError",
 			workflowPaths: []string{workflow(crashLoopBackoffWithFallbackToLogsOnError)},
 			expectReady:   false,
-			expectMessage: "see ya!",
+			expectMessage: `[Pod crashloop]: containers with unready status: [crash][CrashLoopBackOff] back-off 1m20s restarting failed container=crash pod=crashloop_default(0c5eddea-a859-4ee2-bb6a-4f4d0b786d85)
+Container "crash" terminated at 2024-07-03T17:47:36Z (Error: exit code 1)
+see ya!
+`,
 		},
 	}
 	for _, tt := range tests {
