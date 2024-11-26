@@ -3,7 +3,7 @@ module github.com/pulumi/cloud-ready-checks
 go 1.21
 
 require (
-	github.com/pulumi/pulumi/sdk/v3 v3.141.0
+	github.com/pulumi/pulumi/sdk/v3 v3.142.0
 	github.com/stretchr/testify v1.9.0
 	k8s.io/api v0.29.0
 	k8s.io/apimachinery v0.29.0
