@@ -61,19 +61,20 @@ func podInitialized(obj interface{}) checker.Result {
 	result := checker.Result{Description: fmt.Sprintf(
 		"Waiting for Pod %q to be initialized", kubernetes.FullyQualifiedName(pod))}
 
-	if condition, found := filterConditions(pod.Status.Conditions, corev1.PodInitialized); found {
-		switch condition.Status {
-		case corev1.ConditionTrue:
-			result.Ok = true
-		default:
-			var err error
-			for _, status := range pod.Status.ContainerStatuses {
-				err = errors.Join(err, containerStatusErrors(status))
-			}
-			result.Message = logging.WarningMessage(podError(condition, err, kubernetes.FullyQualifiedName(pod)))
-		}
+	initialized, found := filterConditions(pod.Status.Conditions, corev1.PodInitialized)
+	if !found {
+		return result
 	}
 
+	if initialized.Status == corev1.ConditionTrue {
+		result.Ok = true
+		return result
+	}
+
+	err := collectContainerStatusErrors(pod.Status.ContainerStatuses)
+	if err != nil || len(initialized.Message) > 0 {
+		result.Message = logging.WarningMessage(podError(initialized, err, kubernetes.FullyQualifiedName(pod)))
+	}
 	return result
 }
 
@@ -82,21 +83,20 @@ func podReady(obj interface{}) checker.Result {
 	result := checker.Result{Description: fmt.Sprintf(
 		"Waiting for Pod %q to be ready", kubernetes.FullyQualifiedName(pod))}
 
-	if condition, found := filterConditions(pod.Status.Conditions, corev1.PodReady); found {
-		switch condition.Status {
-		case corev1.ConditionTrue:
-			result.Ok = true
-		default:
-			switch pod.Status.Phase {
-			case corev1.PodSucceeded: // If the Pod has terminated, but .status.phase is "Succeeded", consider it Ready.
-				result.Ok = true
-			default:
-				err := collectContainerStatusErrors(pod.Status.ContainerStatuses)
-				result.Message = logging.WarningMessage(podError(condition, err, kubernetes.FullyQualifiedName(pod)))
-			}
-		}
+	ready, found := filterConditions(pod.Status.Conditions, corev1.PodReady)
+	if !found {
+		return result
 	}
 
+	if ready.Status == corev1.ConditionTrue || pod.Status.Phase == corev1.PodSucceeded {
+		result.Ok = true
+		return result
+	}
+
+	err := collectContainerStatusErrors(pod.Status.ContainerStatuses)
+	if err != nil || len(ready.Message) > 0 {
+		result.Message = logging.WarningMessage(podError(ready, err, kubernetes.FullyQualifiedName(pod)))
+	}
 	return result
 }
 
