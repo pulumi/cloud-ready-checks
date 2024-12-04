@@ -1,0 +1,15 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["github>pulumi/renovate-config//default.json5"],
+  packageRules: [
+    {
+      // Automatically bump k8s.io dependencies.
+      matchManagers: ["gomod"],
+      matchPackageNames: ["k8s.io/**"],
+      groupName: "Kubernetes dependencies",
+      automerge: true, // Merge if tests pass.
+      ignoreUnstable: false, // Allow release candidates.
+      dependencyDashboardApproval: false, // Automatically create PRs.
+    },
+  ],
+}
