@@ -8,7 +8,8 @@
       matchPackageNames: ["k8s.io/**"],
       groupName: "Kubernetes dependencies",
       automerge: true, // Merge if tests pass.
-      ignoreUnstable: false, // Allow release candidates.
+      ignoreUnstable: false, // Consider release candidates.
+      respectLatest: false, // Allow updating to release candidates.
       dependencyDashboardApproval: false, // Automatically create PRs.
     },
   ],
