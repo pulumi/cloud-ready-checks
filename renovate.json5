@@ -10,6 +10,7 @@
       automerge: true, // Merge if tests pass.
       ignoreUnstable: false, // Consider release candidates.
       respectLatest: false, // Allow updating to release candidates.
+      allowedVersions: "!/(alpha|beta)/", // Ignore alphas and betas.
       dependencyDashboardApproval: false, // Automatically create PRs.
     },
   ],
