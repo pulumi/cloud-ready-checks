@@ -7,8 +7,8 @@ toolchain go1.23.4
 require (
 	github.com/pulumi/pulumi/sdk/v3 v3.142.0
 	github.com/stretchr/testify v1.10.0
-	k8s.io/api v0.32.0-rc.1
-	k8s.io/apimachinery v0.32.0-rc.1
+	k8s.io/api v0.32.0-rc.2
+	k8s.io/apimachinery v0.32.0-rc.2
 )
 
 require (
