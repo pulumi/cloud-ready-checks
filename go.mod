@@ -5,7 +5,7 @@ go 1.23.0
 toolchain go1.23.4
 
 require (
-	github.com/pulumi/pulumi/sdk/v3 v3.151.0
+	github.com/pulumi/pulumi/sdk/v3 v3.152.0
 	github.com/stretchr/testify v1.10.0
 	k8s.io/api v0.32.2
 	k8s.io/apimachinery v0.32.2
