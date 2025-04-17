@@ -35,8 +35,8 @@ github.com/modern-go/reflect2 v1.0.2/go.mod h1:yWuevngMOJpCy52FWWMvUC8ws7m/LJsjY
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 h1:Jamvg5psRIccs7FGNTlIRMkT8wgtp5eCXdBlqhYGL6U=
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/pulumi/pulumi/sdk/v3 v3.162.0 h1:0XjCLqmBvxmz1WrhSZj6VT6H+GY85PxIzk5d28xfrMY=
-github.com/pulumi/pulumi/sdk/v3 v3.162.0/go.mod h1:GAaHrdv3kWJHbzkFFFflGbTBQXUYu6SF1ZCo+O9jo44=
+github.com/pulumi/pulumi/sdk/v3 v3.163.0 h1:yiT1nPelxXILVrN0yRn0I3NO8Yybba2IvWArYBstZJ8=
+github.com/pulumi/pulumi/sdk/v3 v3.163.0/go.mod h1:GAaHrdv3kWJHbzkFFFflGbTBQXUYu6SF1ZCo+O9jo44=
 github.com/rivo/uniseg v0.4.4 h1:8TfxU8dW6PdqD27gjM8MVNuicgxIjxpm4K7x4jp8sis=
 github.com/rivo/uniseg v0.4.4/go.mod h1:FN3SvrM+Zdj16jyLfmOkMNblXMcoc8DfTHruCPUcx88=
 github.com/rogpeppe/go-internal v1.12.0 h1:exVL4IDcn6na9z1rAb56Vxr+CgyK3nn3O+epU5NdKM8=
