@@ -136,8 +136,7 @@ func containerWaitingError(status corev1.ContainerStatus) error {
 		return nil
 	}
 
-	msg := fmt.Sprintf("[%s] %s", state.Reason, trimImagePullMsg(state.Message))
-	return fmt.Errorf(msg)
+	return fmt.Errorf("[%s] %s", state.Reason, trimImagePullMsg(state.Message))
 }
 
 func containerTerminatedError(status corev1.ContainerStatus) error {
@@ -152,8 +151,7 @@ func containerTerminatedError(status corev1.ContainerStatus) error {
 	}
 
 	if len(state.Message) > 0 {
-		msg := fmt.Sprintf("[%s] %s", state.Reason, trimImagePullMsg(state.Message))
-		return fmt.Errorf(msg)
+		return fmt.Errorf("[%s] %s", state.Reason, trimImagePullMsg(state.Message))
 	}
 	return fmt.Errorf("Container %q completed with exit code %d", status.Name, state.ExitCode)
 }
@@ -169,7 +167,7 @@ func containerLastTerminationState(status corev1.ContainerStatus) error {
 	)
 
 	if terminated.Message != "" {
-		err = errors.Join(err, fmt.Errorf(terminated.Message))
+		err = errors.Join(err, errors.New(terminated.Message))
 	}
 	return err
 }
